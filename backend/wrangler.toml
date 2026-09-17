@@ -1,0 +1,26 @@
+name = "tazecode-api"
+main = "src/index.js"
+compatibility_date = "2026-09-16"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tazecode-db"
+database_id = "3ec632c6-74f5-4113-bd4f-1c8ce1877a85"
+
+# Weekly automated backup: dumps all content tables to JSON and emails it
+# as an attachment via Resend (runs every Sunday 00:00 UTC / 07:00 WIB).
+[triggers]
+crons = ["0 0 * * MON"]
+
+# R2 was not enabled on the Cloudflare account yet at build time.
+# Once you click "Enable R2" in the Cloudflare dashboard, uncomment this,
+# then run: wrangler r2 bucket create tazecode-media
+# (or use the r2_bucket_create MCP tool again — it will succeed once enabled).
+# [[r2_buckets]]
+# binding = "MEDIA"
+# bucket_name = "tazecode-media"
+
+# Set this secret before deploying:
+#   wrangler secret put JWT_SECRET
+# (any long random string — used to sign admin login tokens)

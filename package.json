@@ -1,0 +1,16 @@
+{
+  "name": "tazecode",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TAZECODE — frontend (React/Vite, deployed to Cloudflare Pages) + backend (Hono API, deployed to Cloudflare Workers + D1).",
+  "scripts": {
+    "install:all": "npm install --prefix frontend && npm install --prefix backend",
+    "dev": "npm run dev --prefix frontend",
+    "dev:api": "npm run dev --prefix backend",
+    "build": "npm run build --prefix frontend",
+    "deploy": "npm run deploy --prefix frontend",
+    "deploy:api": "npm run deploy --prefix backend",
+    "deploy:all": "npm run deploy:api && npm run deploy",
+    "reset-password": "npm run reset-password --prefix backend --"
+  }
+}

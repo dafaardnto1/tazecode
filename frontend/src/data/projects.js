@@ -1,0 +1,152 @@
+// Central project data. Replace with real projects — keep content truthful.
+// Later: this will be replaced by a Supabase query (see src/lib/supabaseClient.js).
+export const PROJECTS = [
+  {
+    slug: "kasir-warung-pos",
+    name: "Kasir Warung — POS System",
+    category: "POS / Kasir",
+    year: "2025",
+    client: "UMKM Warung Kelontong (Personal Project)",
+    role: "Full Stack Developer",
+    duration: "3 weeks",
+    tech: ["Laravel", "MySQL", "Tailwind CSS", "Alpine.js"],
+    description: "Sistem kasir sederhana untuk warung kelontong dengan manajemen stok, transaksi, dan laporan harian.",
+    problem: "Pemilik warung mencatat transaksi dan stok secara manual di buku, sehingga rawan salah hitung dan sulit melihat laporan penjualan bulanan.",
+    solution: "Dibangun aplikasi kasir berbasis web yang bisa diakses dari satu perangkat di kasir, dengan pencatatan transaksi otomatis dan laporan stok real-time.",
+    features: [
+      "Input transaksi cepat dengan pencarian produk",
+      "Manajemen stok otomatis saat transaksi tersimpan",
+      "Laporan penjualan harian dan bulanan",
+      "Role akses untuk kasir dan pemilik",
+      "Cetak struk sederhana"
+    ],
+    challenges: "Menjaga akurasi stok saat terjadi transaksi ganda dalam waktu bersamaan, diselesaikan dengan locking transaksi di level database.",
+    result: "Waktu pencatatan transaksi berkurang, dan pemilik warung dapat memantau stok tanpa menghitung manual di akhir hari.",
+    live: "",
+    github: "",
+    featured: true
+  },
+  {
+    slug: "rentalku-motor-rental",
+    name: "Rentalku — Motor Rental System",
+    category: "Rental System",
+    year: "2025",
+    client: "Client Project",
+    role: "Full Stack Developer",
+    duration: "1 month",
+    tech: ["Laravel", "PostgreSQL", "Bootstrap", "Midtrans API"],
+    description: "Platform penyewaan motor dengan jadwal ketersediaan unit, booking online, dan integrasi pembayaran.",
+    problem: "Proses booking motor sewa masih dilakukan lewat chat manual, sering terjadi bentrok jadwal antar penyewa.",
+    solution: "Dibangun sistem booking dengan kalender ketersediaan unit per hari dan status pembayaran otomatis lewat payment gateway.",
+    features: [
+      "Kalender ketersediaan unit motor",
+      "Booking online dengan konfirmasi otomatis",
+      "Integrasi pembayaran (Midtrans)",
+      "Dashboard admin untuk kelola unit dan pemesanan",
+      "Notifikasi email saat status booking berubah"
+    ],
+    challenges: "Mencegah double booking pada unit yang sama saat dua user memesan bersamaan, diselesaikan dengan validasi jadwal di sisi server sebelum konfirmasi.",
+    result: "Proses booking berjalan tanpa bentrok jadwal dan admin dapat memantau semua pemesanan dari satu dashboard.",
+    live: "",
+    github: "",
+    featured: true
+  },
+  {
+    slug: "laundryflow",
+    name: "LaundryFlow — Laundry Management",
+    category: "Laundry System",
+    year: "2024",
+    client: "Client Project",
+    role: "Backend Developer",
+    duration: "3 weeks",
+    tech: ["Node.js", "Express", "MySQL", "React"],
+    description: "Sistem manajemen laundry untuk pencatatan order, tracking status cucian, dan notifikasi pelanggan.",
+    problem: "Pelanggan sering menanyakan status cucian lewat telepon karena tidak ada cara untuk mengecek sendiri.",
+    solution: "Dibuat sistem tracking order dengan status berjenjang (diterima, dicuci, selesai, diambil) yang bisa dicek pelanggan lewat nomor order.",
+    features: [
+      "Input order dengan estimasi selesai otomatis",
+      "Tracking status order per tahap",
+      "Riwayat transaksi pelanggan",
+      "Perhitungan harga berdasarkan berat dan layanan"
+    ],
+    challenges: "Merancang struktur status order yang fleksibel untuk berbagai jenis layanan (cuci kering, setrika, express).",
+    result: "Pertanyaan status cucian lewat telepon berkurang karena pelanggan bisa mengecek sendiri secara online.",
+    live: "",
+    github: "",
+    featured: false
+  },
+  {
+    slug: "beritalokal-cms",
+    name: "BeritaLokal — News Website & CMS",
+    category: "News Website",
+    year: "2024",
+    client: "Personal Project",
+    role: "Full Stack Developer",
+    duration: "1 month",
+    tech: ["Laravel", "MySQL", "Tailwind CSS", "TinyMCE"],
+    description: "Website berita lokal dengan CMS untuk penulis mengelola artikel, kategori, dan media.",
+    problem: "Redaksi berita lokal membutuhkan platform sendiri untuk publikasi tanpa bergantung pada platform pihak ketiga.",
+    solution: "Dibangun CMS custom dengan editor artikel, manajemen kategori, dan halaman publik yang cepat diakses.",
+    features: [
+      "Editor artikel dengan gambar dan embed",
+      "Manajemen kategori dan tag",
+      "Role penulis dan editor",
+      "Halaman publik dengan pencarian artikel",
+      "SEO meta per artikel"
+    ],
+    challenges: "Mengoptimalkan waktu load halaman publik yang berisi banyak gambar artikel.",
+    result: "Redaksi dapat mempublikasikan artikel sendiri tanpa bantuan developer untuk setiap update konten.",
+    live: "",
+    github: "",
+    featured: false
+  },
+  {
+    slug: "tokonyaku-ecommerce",
+    name: "Tokonyaku — E-Commerce Store",
+    category: "E-Commerce",
+    year: "2024",
+    client: "Client Project",
+    role: "Full Stack Developer",
+    duration: "6 weeks",
+    tech: ["Laravel", "MySQL", "Tailwind CSS", "Midtrans API"],
+    description: "Toko online untuk UMKM fashion dengan katalog produk, keranjang, dan checkout terintegrasi pembayaran.",
+    problem: "Penjualan hanya lewat media sosial membuat pemilik toko kesulitan mengelola stok dan pesanan yang masuk dari berbagai chat.",
+    solution: "Dibangun toko online dengan katalog produk terpusat, keranjang belanja, dan checkout dengan status pesanan yang jelas.",
+    features: [
+      "Katalog produk dengan varian ukuran/warna",
+      "Keranjang dan checkout",
+      "Integrasi pembayaran otomatis",
+      "Dashboard pesanan untuk admin",
+      "Manajemen stok per varian"
+    ],
+    challenges: "Menyusun struktur database varian produk agar tetap sederhana namun fleksibel untuk kombinasi ukuran dan warna.",
+    result: "Seluruh pesanan tercatat di satu sistem, mengurangi kesalahan pencatatan stok dari sebelumnya yang manual.",
+    live: "",
+    github: "",
+    featured: true
+  },
+  {
+    slug: "opsdash-dashboard",
+    name: "OpsDash — Internal Operations Dashboard",
+    category: "Dashboard",
+    year: "2023",
+    client: "Client Project",
+    role: "Frontend Developer",
+    duration: "2 weeks",
+    tech: ["React", "Node.js", "PostgreSQL", "Chart.js"],
+    description: "Dashboard internal untuk memantau metrik operasional tim lapangan secara real-time.",
+    problem: "Tim manajemen tidak punya visibilitas terhadap data operasional harian tanpa meminta laporan manual dari tim lapangan.",
+    solution: "Dibangun dashboard yang menarik data operasional dan menampilkannya dalam grafik dan tabel yang mudah dibaca.",
+    features: [
+      "Grafik metrik harian dan mingguan",
+      "Filter berdasarkan tim dan periode",
+      "Ekspor data ke CSV",
+      "Update data berkala otomatis"
+    ],
+    challenges: "Menampilkan volume data yang besar tanpa membuat dashboard terasa berat saat dibuka.",
+    result: "Manajemen dapat memantau metrik operasional langsung tanpa menunggu laporan manual.",
+    live: "",
+    github: "",
+    featured: false
+  }
+];
