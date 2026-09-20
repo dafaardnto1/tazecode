@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ImageUpload from "./ImageUpload";
+import CroppedImageUpload from "./CroppedImageUpload";
 
 const EMPTY = {
   slug: "", name: "", category: "", year: "", client: "", role: "", duration: "",
@@ -102,7 +102,7 @@ export default function ProjectForm({ initial, onSubmit, onCancel, submitting })
         <input id="duration" value={values.duration || ""} onChange={(e) => set("duration", e.target.value)} placeholder="3 weeks" />
       </div>
 
-      <ImageUpload label="Thumbnail Project" value={values.thumbnail_url} onChange={(url) => set("thumbnail_url", url)} />
+      <CroppedImageUpload label="Thumbnail Project" value={values.thumbnail_url} onChange={(url) => set("thumbnail_url", url)} />
 
       <div className="admin-field">
         <label htmlFor="description">Deskripsi Singkat</label>

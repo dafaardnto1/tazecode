@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import FaqSection from "../components/FaqSection";
 import Reveal from "../components/Reveal";
 import Seo from "../components/Seo";
+import { SkeletonGrid } from "../components/Skeleton";
 import { useLanguage } from "../i18n/LanguageContext";
-import { usePricing } from "../hooks/useApiData";
+import { usePricing, useSettings } from "../hooks/useApiData";
+import { useAutoTranslate } from "../hooks/useAutoTranslate";
 
 function formatPrice(price) {
   const num = Number(price);
@@ -14,7 +16,18 @@ function formatPrice(price) {
 export default function Pricelist() {
   const { t } = useLanguage();
   const p = t.pricelist;
-  const { pricing } = usePricing();
+  const { pricing, loading } = usePricing();
+  const { settings } = useSettings();
+  const page = useAutoTranslate({
+    eyebrow: settings.page_pricing_eyebrow,
+    title: settings.page_pricing_title,
+    desc: settings.page_pricing_desc,
+    note: settings.page_pricing_note
+  });
+  const pageEyebrow = page.eyebrow || p.eyebrow;
+  const pageTitle = page.title || p.title;
+  const pageDesc = page.desc || p.desc;
+  const pageNote = page.note || p.note;
 
   return (
     <>
@@ -22,34 +35,40 @@ export default function Pricelist() {
 
       <section style={{ paddingBottom: 0 }}>
         <div className="container">
-          <div className="eyebrow">{p.eyebrow}</div>
-          <h1 className="section-title">{p.title}</h1>
-          <p className="section-desc" style={{ marginTop: 14 }}>{p.desc}</p>
+          <div className="eyebrow">{pageEyebrow}</div>
+          <h1 className="section-title">{pageTitle}</h1>
+          <p className="section-desc" style={{ marginTop: 14 }}>{pageDesc}</p>
         </div>
       </section>
 
       <Reveal>
         <div className="container">
-          <div className="pricing-grid">
-            {pricing.map((plan) => (
-              <div className={`price-card${plan.is_popular ? " popular" : ""}`} key={plan.id}>
-                {plan.is_popular && <div className="price-badge">{p.popularBadge}</div>}
-                <div className="price-name">{plan.name}</div>
-                <div className="price-amount">
-                  {plan.price_suffix && <span className="price-suffix">{plan.price_suffix}</span>}
-                  <span className="price-num">{formatPrice(plan.price)}</span>
-                </div>
-                <p className="price-desc">{plan.description}</p>
-                <ul className="price-features">
-                  {(plan.features || []).map((f) => <li key={f}>{f}</li>)}
-                </ul>
-                <Link to="/contact" className={`btn ${plan.is_popular ? "btn-primary" : "btn-ghost"}`} style={{ justifyContent: "center", width: "100%" }}>
-                  {p.ctaBtn}
-                </Link>
+          {loading ? (
+            <SkeletonGrid count={4} lines={4} />
+          ) : (
+            <>
+              <div className="pricing-grid">
+                {pricing.map((plan) => (
+                  <div className={`price-card${plan.is_popular ? " popular" : ""}`} key={plan.id}>
+                    {plan.is_popular && <div className="price-badge">{p.popularBadge}</div>}
+                    <div className="price-name">{plan.name}</div>
+                    <div className="price-amount">
+                      {plan.price_suffix && <span className="price-suffix">{plan.price_suffix}</span>}
+                      <span className="price-num">{formatPrice(plan.price)}</span>
+                    </div>
+                    <p className="price-desc">{plan.description}</p>
+                    <ul className="price-features">
+                      {(plan.features || []).map((f) => <li key={f}>{f}</li>)}
+                    </ul>
+                    <Link to="/contact" className={`btn ${plan.is_popular ? "btn-primary" : "btn-ghost"}`} style={{ justifyContent: "center", width: "100%" }}>
+                      {p.ctaBtn}
+                    </Link>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <p className="price-note">{p.note}</p>
+              <p className="price-note">{pageNote}</p>
+            </>
+          )}
         </div>
       </Reveal>
 

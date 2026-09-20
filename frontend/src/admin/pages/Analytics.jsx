@@ -47,29 +47,24 @@ export default function AdminAnalytics() {
 
           <div className="admin-panel">
             <div className="admin-panel-head"><h2>Kunjungan Harian (14 Hari)</h2></div>
-            <div className="admin-form" style={{ padding: "20px" }}>
-              {data.byDay.length === 0 ? (
-                <div className="admin-empty">Belum ada data.</div>
-              ) : (
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 140 }}>
-                  {data.byDay.map((d) => (
-                    <div key={d.day} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                      <div
-                        style={{
-                          width: "100%",
-                          background: "var(--accent)",
-                          height: maxDayViews ? `${Math.max(4, (d.views / maxDayViews) * 100)}px` : "4px"
-                        }}
-                        title={`${d.day}: ${d.views} kunjungan`}
-                      />
-                      <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--muted)", writingMode: "vertical-rl" }}>
-                        {d.day.slice(5)}
+            {data.byDay.length === 0 ? (
+              <div className="admin-empty">Belum ada data.</div>
+            ) : (
+              <div className="analytics-chart">
+                {data.byDay.map((d) => {
+                  const pct = maxDayViews ? Math.max(3, Math.round((d.views / maxDayViews) * 100)) : 3;
+                  return (
+                    <div className="analytics-bar-col" key={d.day} title={`${d.day}: ${d.views} kunjungan`}>
+                      <div className="analytics-bar-value">{d.views}</div>
+                      <div className="analytics-bar-track">
+                        <div className="analytics-bar" style={{ height: `${pct}%` }} />
                       </div>
+                      <div className="analytics-bar-label">{d.day.slice(5)}</div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="admin-panel">

@@ -2,13 +2,24 @@ import { useMemo, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
 import Reveal from "../components/Reveal";
 import Seo from "../components/Seo";
-import { useProjects } from "../hooks/useApiData";
+import { SkeletonGrid } from "../components/Skeleton";
+import { useProjects, useSettings } from "../hooks/useApiData";
+import { useAutoTranslate } from "../hooks/useAutoTranslate";
 import { useLanguage } from "../i18n/LanguageContext";
 
 export default function Projects() {
   const { t } = useLanguage();
   const p = t.projects;
-  const { projects } = useProjects();
+  const { projects, loading } = useProjects();
+  const { settings } = useSettings();
+  const page = useAutoTranslate({
+    eyebrow: settings.page_projects_eyebrow,
+    title: settings.page_projects_title,
+    desc: settings.page_projects_desc
+  });
+  const pageEyebrow = page.eyebrow || p.eyebrow;
+  const pageTitle = page.title || p.title;
+  const pageDesc = page.desc || p.desc;
   const categories = useMemo(() => [p.all, ...new Set(projects.map((pr) => pr.category))], [p.all, projects]);
   const [activeCat, setActiveCat] = useState(p.all);
   const [term, setTerm] = useState("");
@@ -26,9 +37,9 @@ export default function Projects() {
 
       <section style={{ paddingBottom: 0 }}>
         <div className="container">
-          <div className="eyebrow">{p.eyebrow}</div>
-          <h1 className="section-title">{p.title}</h1>
-          <p className="section-desc" style={{ marginTop: 14 }}>{p.desc}</p>
+          <div className="eyebrow">{pageEyebrow}</div>
+          <h1 className="section-title">{pageTitle}</h1>
+          <p className="section-desc" style={{ marginTop: 14 }}>{pageDesc}</p>
         </div>
       </section>
 
@@ -58,7 +69,9 @@ export default function Projects() {
             />
           </div>
 
-          {filtered.length === 0 ? (
+          {loading ? (
+            <SkeletonGrid count={6} lines={2} />
+          ) : filtered.length === 0 ? (
             <div className="empty-state">{p.empty}</div>
           ) : (
             <div className="grid-3">

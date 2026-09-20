@@ -26,6 +26,7 @@ import AdminMessages from "./admin/pages/Messages";
 import AdminSubscribers from "./admin/pages/Subscribers";
 import AdminAnalytics from "./admin/pages/Analytics";
 import AdminSettings from "./admin/pages/Settings";
+import AdminControlPanel from "./admin/pages/ControlPanel";
 
 export default function App() {
   return (
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="subscribers" element={<AdminSubscribers />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="control-panel" element={<AdminControlPanel />} />
         </Route>
       </Routes>
     </AdminAuthProvider>

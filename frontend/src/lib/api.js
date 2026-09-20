@@ -101,6 +101,8 @@ export const api = {
   updateProcessStep: (id, data) => request(`/api/process-steps/${id}`, { method: "PUT", auth: true, body: data }),
   deleteProcessStep: (id) => request(`/api/process-steps/${id}`, { method: "DELETE", auth: true }),
 
+  translateBatch: (texts) => request("/api/translate", { method: "POST", body: { texts } }).then((r) => r.translations),
+
   getFaqs: () => request("/api/faqs"),
   createFaq: (data) => request("/api/faqs", { method: "POST", auth: true, body: data }),
   updateFaq: (id, data) => request(`/api/faqs/${id}`, { method: "PUT", auth: true, body: data }),
@@ -119,6 +121,7 @@ export const api = {
 
   getProjectImages: (projectId) => request(`/api/project-images/${projectId}`),
   addProjectImage: (projectId, imageUrl) => request("/api/project-images", { method: "POST", auth: true, body: { project_id: projectId, image_url: imageUrl } }),
+  updateProjectImage: (id, imageUrl) => request(`/api/project-images/${id}`, { method: "PUT", auth: true, body: { image_url: imageUrl } }),
   deleteProjectImage: (id) => request(`/api/project-images/${id}`, { method: "DELETE", auth: true }),
 
   track: (path, referrer) => request("/api/track", { method: "POST", body: { path, referrer } }).catch(() => {}),

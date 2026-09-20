@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal";
 import Seo from "../components/Seo";
-import { useServices } from "../hooks/useApiData";
+import { SkeletonGrid } from "../components/Skeleton";
+import { useServices, useSettings } from "../hooks/useApiData";
+import { useAutoTranslate } from "../hooks/useAutoTranslate";
 import { useLanguage } from "../i18n/LanguageContext";
 import { SITE_URL, SITE_NAME } from "../lib/seoConfig";
 
@@ -9,7 +11,16 @@ export default function Services() {
   const { t } = useLanguage();
   const s = t.services;
   const staticItems = s.items.map((item) => ({ title: item.title, description: item.desc, features: item.features }));
-  const { services: items } = useServices(staticItems);
+  const { services: items, loading } = useServices(staticItems);
+  const { settings } = useSettings();
+  const page = useAutoTranslate({
+    eyebrow: settings.page_services_eyebrow,
+    title: settings.page_services_title,
+    desc: settings.page_services_desc
+  });
+  const pageEyebrow = page.eyebrow || s.eyebrow;
+  const pageTitle = page.title || s.title;
+  const pageDesc = page.desc || s.desc;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -33,26 +44,30 @@ export default function Services() {
 
       <section style={{ paddingBottom: 0 }}>
         <div className="container">
-          <div className="eyebrow">{s.eyebrow}</div>
-          <h1 className="section-title">{s.title}</h1>
-          <p className="section-desc" style={{ marginTop: 14 }}>{s.desc}</p>
+          <div className="eyebrow">{pageEyebrow}</div>
+          <h1 className="section-title">{pageTitle}</h1>
+          <p className="section-desc" style={{ marginTop: 14 }}>{pageDesc}</p>
         </div>
       </section>
 
       <Reveal>
         <div className="container">
-          <div className="grid-3">
-            {items.map((item, i) => (
-              <div className="service-card" key={item.id || item.title}>
-                <div className="service-index">{String(i + 1).padStart(2, "0")}</div>
-                <div className="service-title">{item.title}</div>
-                <p className="service-desc">{item.description}</p>
-                <ul className="service-features">
-                  {(item.features || []).map((f) => <li key={f}>{f}</li>)}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <SkeletonGrid count={6} lines={3} />
+          ) : (
+            <div className="auto-grid">
+              {items.map((item, i) => (
+                <div className="service-card" key={item.id || item.title}>
+                  <div className="service-index">{String(i + 1).padStart(2, "0")}</div>
+                  <div className="service-title">{item.title}</div>
+                  <p className="service-desc">{item.description}</p>
+                  <ul className="service-features">
+                    {(item.features || []).map((f) => <li key={f}>{f}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Reveal>
 

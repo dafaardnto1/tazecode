@@ -3,7 +3,8 @@ import NewsletterForm from "../components/NewsletterForm";
 import Reveal from "../components/Reveal";
 import Seo from "../components/Seo";
 import { SkeletonGrid } from "../components/Skeleton";
-import { useArticles } from "../hooks/useApiData";
+import { useArticles, useSettings } from "../hooks/useApiData";
+import { useAutoTranslate } from "../hooks/useAutoTranslate";
 import { useLanguage } from "../i18n/LanguageContext";
 
 function formatDate(iso) {
@@ -18,6 +19,15 @@ export default function Blog() {
   const { t } = useLanguage();
   const b = t.blog;
   const { articles, loading } = useArticles();
+  const { settings } = useSettings();
+  const page = useAutoTranslate({
+    eyebrow: settings.page_blog_eyebrow,
+    title: settings.page_blog_title,
+    desc: settings.page_blog_desc
+  });
+  const pageEyebrow = page.eyebrow || b.eyebrow;
+  const pageTitle = page.title || b.title;
+  const pageDesc = page.desc || b.desc;
 
   return (
     <>
@@ -25,9 +35,9 @@ export default function Blog() {
 
       <section style={{ paddingBottom: 0 }}>
         <div className="container">
-          <div className="eyebrow">{b.eyebrow}</div>
-          <h1 className="section-title">{b.title}</h1>
-          <p className="section-desc" style={{ marginTop: 14 }}>{b.desc}</p>
+          <div className="eyebrow">{pageEyebrow}</div>
+          <h1 className="section-title">{pageTitle}</h1>
+          <p className="section-desc" style={{ marginTop: 14 }}>{pageDesc}</p>
         </div>
       </section>
 
@@ -38,7 +48,7 @@ export default function Blog() {
           ) : articles.length === 0 ? (
             <div className="empty-state">{b.empty}</div>
           ) : (
-            <div className="grid-3">
+            <div className="blog-grid">
               {articles.map((a) => (
                 <Link to={`/blog/${a.slug}`} className="blog-card" key={a.id}>
                   {a.cover_image_url && (

@@ -5,6 +5,7 @@ import { useAdminAuth } from "./AuthContext";
 
 const LINKS = [
   ["/admin", "Dashboard", true],
+  ["/admin/control-panel", "Control Panel", false],
   ["/admin/projects", "Projects", false],
   ["/admin/services", "Services", false],
   ["/admin/pricing", "Harga / Pricelist", false],

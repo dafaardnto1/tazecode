@@ -8,6 +8,11 @@ binding = "DB"
 database_name = "tazecode-db"
 database_id = "3ec632c6-74f5-4113-bd4f-1c8ce1877a85"
 
+# Workers AI — used for automatic ID→EN translation of dashboard content
+# (projects, services, FAQ, blog, etc). Free tier included, no separate signup.
+[ai]
+binding = "AI"
+
 # Weekly automated backup: dumps all content tables to JSON and emails it
 # as an attachment via Resend (runs every Sunday 00:00 UTC / 07:00 WIB).
 [triggers]

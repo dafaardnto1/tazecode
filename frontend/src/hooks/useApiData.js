@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { PROJECTS as STATIC_PROJECTS } from "../data/projects";
+import { useAutoTranslate, useAutoTranslateFields } from "./useAutoTranslate";
+
+const PROJECT_FIELDS = ["name", "category", "description", "problem", "solution", "features", "challenges", "result", "role", "client", "duration"];
+const SERVICE_FIELDS = ["title", "description", "features"];
+const PRICING_FIELDS = ["name", "description", "features", "price_suffix"];
+const FAQ_FIELDS = ["question", "answer"];
+const TESTIMONIAL_FIELDS = ["review_text", "client_position", "client_company"];
+const ARTICLE_LIST_FIELDS = ["title", "excerpt"];
+export const ARTICLE_DETAIL_FIELDS = ["title", "excerpt", "content"];
+const PROCESS_FIELDS = ["title", "description"];
 
 // Fetches live data from the Worker API; falls back to the bundled static
 // data if the API is unreachable (e.g. Worker not deployed yet, or offline).
@@ -30,7 +40,8 @@ export function useProjects() {
     };
   }, []);
 
-  return { projects, source, loading };
+  const translated = useAutoTranslateFields(projects, PROJECT_FIELDS);
+  return { projects: translated, source, loading };
 }
 
 export function useTestimonials() {
@@ -55,7 +66,8 @@ export function useTestimonials() {
     };
   }, []);
 
-  return { testimonials, loading };
+  const translated = useAutoTranslateFields(testimonials, TESTIMONIAL_FIELDS);
+  return { testimonials: translated, loading };
 }
 
 const DEFAULT_SETTINGS = {
@@ -126,7 +138,8 @@ export function usePricing() {
     };
   }, []);
 
-  return { pricing, loading };
+  const translated = useAutoTranslateFields(pricing, PRICING_FIELDS);
+  return { pricing: translated, loading };
 }
 
 const DEFAULT_PROCESS_STEPS = [
@@ -158,7 +171,8 @@ export function useProcessSteps() {
     };
   }, []);
 
-  return { steps, loading };
+  const translated = useAutoTranslateFields(steps, PROCESS_FIELDS);
+  return { steps: translated, loading };
 }
 
 const DEFAULT_FAQS = [
@@ -189,7 +203,8 @@ export function useFaqs() {
     };
   }, []);
 
-  return { faqs, loading };
+  const translated = useAutoTranslateFields(faqs, FAQ_FIELDS);
+  return { faqs: translated, loading };
 }
 
 export function useArticles() {
@@ -214,7 +229,8 @@ export function useArticles() {
     };
   }, []);
 
-  return { articles, loading };
+  const translated = useAutoTranslateFields(articles, ARTICLE_LIST_FIELDS);
+  return { articles: translated, loading };
 }
 
 export function useServices(staticServices) {
@@ -243,5 +259,9 @@ export function useServices(staticServices) {
     };
   }, []);
 
-  return { services, source, loading };
+  // Only translate API-sourced content — the static fallback already comes
+  // from the reactive i18n translations, so re-translating it would risk
+  // mangling text that's already correct for the active language.
+  const translated = useAutoTranslateFields(source === "api" ? services : null, SERVICE_FIELDS);
+  return { services: source === "api" ? translated : services, source, loading };
 }

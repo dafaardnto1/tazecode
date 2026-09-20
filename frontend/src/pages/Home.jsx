@@ -4,13 +4,15 @@ import ProjectCard from "../components/ProjectCard";
 import ProcessTimeline from "../components/ProcessTimeline";
 import Reveal from "../components/Reveal";
 import Seo from "../components/Seo";
-import { SkeletonGrid } from "../components/Skeleton";
+import { SkeletonBlock, SkeletonGrid } from "../components/Skeleton";
+import ServicesCarousel from "../components/ServicesCarousel";
 import { useCountUp } from "../hooks/useCountUp";
-import { useProjects, useSettings, useTestimonials } from "../hooks/useApiData";
+import { useProjects, useServices, useSettings, useTestimonials } from "../hooks/useApiData";
+import { useAutoTranslate } from "../hooks/useAutoTranslate";
 import { useLanguage } from "../i18n/LanguageContext";
 import { SITE_URL, SITE_NAME, BUSINESS_DESCRIPTION } from "../lib/seoConfig";
 
-const TECH = ["Diskon 30% Website", "Gratis Domain 1 Tahun", "Support 24/7", "Promo Paket Bundling", "Gratis Konsultasi", "Cicilan 0% Tersedia"];
+const DEFAULT_TECH = ["Diskon 30% Website", "Gratis Domain 1 Tahun", "Support 24/7", "Promo Paket Bundling", "Gratis Konsultasi", "Cicilan 0% Tersedia"];
 
 function Stat({ target, suffix, label }) {
   const { ref, display } = useCountUp(target, { suffix });
@@ -24,10 +26,41 @@ function Stat({ target, suffix, label }) {
 
 export default function Home() {
   const { t } = useLanguage();
-  const { projects } = useProjects();
-  const { settings } = useSettings();
+  const { projects, loading: projectsLoading } = useProjects();
+  const { settings, loading: settingsLoading } = useSettings();
   const { testimonials, loading: testimonialsLoading } = useTestimonials();
   const featured = projects.filter((p) => p.featured).slice(0, 3);
+
+  const staticServiceItems = t.services.items.map((item) => ({ title: item.title, description: item.desc, features: item.features }));
+  const { services, loading: servicesLoading } = useServices(staticServiceItems);
+  const serviceCarouselItems = services.map((item, i) => ({
+    i: String(i + 1).padStart(2, "0"),
+    title: item.title,
+    desc: item.description
+  }));
+
+  const heroOverridesRaw = {
+    kicker: settings.hero_kicker,
+    h1a: settings.hero_title_line1,
+    h1b: settings.hero_title_line2,
+    h1em: settings.hero_title_highlight,
+    desc: settings.hero_desc,
+    ctaPrimary: settings.hero_cta_primary,
+    ctaSecondary: settings.hero_cta_secondary,
+    keywords: settings.hero_keywords ? settings.hero_keywords.split(",").map((s) => s.trim()).filter(Boolean) : null,
+    promo: settings.hero_promo_text ? settings.hero_promo_text.split(",").map((s) => s.trim()).filter(Boolean) : null
+  };
+  const hero = useAutoTranslate(heroOverridesRaw);
+
+  const heroKicker = hero.kicker || t.home.kicker;
+  const heroH1a = hero.h1a || t.home.h1a;
+  const heroH1b = hero.h1b || t.home.h1b;
+  const heroH1em = hero.h1em || t.home.h1em;
+  const heroDesc = hero.desc || t.home.desc;
+  const heroCtaPrimary = hero.ctaPrimary || t.home.ctaProjects;
+  const heroCtaSecondary = hero.ctaSecondary || t.home.ctaTalk;
+  const heroKeywords = hero.keywords || t.home.keywordTags;
+  const TECH = hero.promo || DEFAULT_TECH;
 
   const techStripRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -75,23 +108,32 @@ export default function Home() {
 
       <section className="hero">
         <div className="container hero-grid">
-          <div>
-            <div className="hero-kicker">{t.home.kicker}</div>
-            <h1>{t.home.h1a}<br />{t.home.h1b}<em>{t.home.h1em}</em></h1>
-            <p className="hero-desc">{t.home.desc}</p>
-            <div className="hero-actions">
-              <Link to="/projects" className="btn btn-primary">{t.home.ctaProjects}</Link>
-              <Link to="/contact" className="btn btn-ghost">{t.home.ctaTalk}</Link>
+          {settingsLoading ? (
+            <div className="hero-skeleton">
+              <SkeletonBlock width="40%" height={14} style={{ marginBottom: 18 }} />
+              <SkeletonBlock width="90%" height={54} style={{ marginBottom: 12 }} />
+              <SkeletonBlock width="70%" height={54} style={{ marginBottom: 22 }} />
+              <SkeletonBlock width="55%" height={18} style={{ marginBottom: 8 }} />
+              <SkeletonBlock width="45%" height={18} style={{ marginBottom: 34 }} />
+              <div style={{ display: "flex", gap: 14 }}>
+                <SkeletonBlock width={160} height={48} />
+                <SkeletonBlock width={160} height={48} />
+              </div>
             </div>
-            <ul className="hero-keywords" aria-label="Layanan">
-              {t.home.keywordTags.map((kw) => <li key={kw}>{kw}</li>)}
-            </ul>
-          </div>
-          <div className="hero-meta">
-            <div><strong>{t.home.metaBased}</strong>{t.home.metaBasedVal}</div>
-            <div><strong>{t.home.metaFocus}</strong>{t.home.metaFocusVal}</div>
-            <div><strong>{t.home.metaStack}</strong>{t.home.metaStackVal}</div>
-          </div>
+          ) : (
+            <div>
+              <div className="hero-kicker">{heroKicker}</div>
+              <h1>{heroH1a}<br />{heroH1b}<em>{heroH1em}</em></h1>
+              <p className="hero-desc">{heroDesc}</p>
+              <div className="hero-actions">
+                <Link to="/projects" className="btn btn-primary">{heroCtaPrimary}</Link>
+                <Link to="/contact" className="btn btn-ghost">{heroCtaSecondary}</Link>
+              </div>
+              <ul className="hero-keywords" aria-label="Layanan">
+                {heroKeywords.map((kw) => <li key={kw}>{kw}</li>)}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
 
@@ -106,9 +148,13 @@ export default function Home() {
             <h2 className="section-title">{t.home.workTitle}</h2>
             <p className="section-desc">{t.home.workDesc}</p>
           </div>
-          <div className="grid-3">
-            {featured.map((p, i) => <ProjectCard key={p.slug} project={p} index={i} />)}
-          </div>
+          {projectsLoading ? (
+            <SkeletonGrid count={3} lines={2} />
+          ) : (
+            <div className="grid-3">
+              {featured.map((p, i) => <ProjectCard key={p.slug} project={p} index={i} />)}
+            </div>
+          )}
           <div style={{ marginTop: 28 }}>
             <Link to="/projects" className="btn btn-ghost">{t.home.viewAll}</Link>
           </div>
@@ -122,23 +168,11 @@ export default function Home() {
             <h2 className="section-title">{t.home.doTitle}</h2>
             <p className="section-desc">{t.home.doDesc}</p>
           </div>
-          <div className="grid-3">
-            <div className="cell">
-              <div className="service-index">01</div>
-              <div className="service-title">{t.home.s1title}</div>
-              <p className="service-desc">{t.home.s1desc}</p>
-            </div>
-            <div className="cell">
-              <div className="service-index">02</div>
-              <div className="service-title">{t.home.s2title}</div>
-              <p className="service-desc">{t.home.s2desc}</p>
-            </div>
-            <div className="cell">
-              <div className="service-index">03</div>
-              <div className="service-title">{t.home.s3title}</div>
-              <p className="service-desc">{t.home.s3desc}</p>
-            </div>
-          </div>
+          {servicesLoading ? (
+            <SkeletonGrid count={3} lines={2} />
+          ) : (
+            <ServicesCarousel items={serviceCarouselItems} />
+          )}
           <div style={{ marginTop: 28 }}>
             <Link to="/services" className="btn btn-ghost">{t.home.seeAllServices}</Link>
           </div>
@@ -166,7 +200,7 @@ export default function Home() {
             {testimonialsLoading ? (
               <SkeletonGrid count={3} lines={3} />
             ) : (
-            <div className="grid-3">
+            <div className="auto-grid">
               {testimonials.slice(0, 6).map((tm) => (
                 <div className="testimonial-card" key={tm.id}>
                   <div className="testimonial-rating">{"★".repeat(tm.rating || 5)}{"☆".repeat(5 - (tm.rating || 5))}</div>

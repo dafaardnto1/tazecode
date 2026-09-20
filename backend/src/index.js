@@ -4,14 +4,52 @@ import { hashPassword, signToken, requireAuth } from "./auth.js";
 
 const app = new Hono();
 
+const ALLOWED_ORIGINS = [
+  "https://tazecode.pages.dev",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173"
+];
+
 app.use(
   "/api/*",
   cors({
-    origin: "*",
+    origin: (origin) => {
+      if (!origin) return ALLOWED_ORIGINS[0]; // same-origin/non-browser requests send no Origin header
+      if (ALLOWED_ORIGINS.includes(origin) || /\.tazecode\.pages\.dev$/.test(new URL(origin).hostname)) return origin;
+      return null;
+    },
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"]
   })
 );
+
+// Security headers on every response — this API only ever returns JSON, so a
+// locked-down CSP is safe and blocks it from ever being framed/embedded or
+// used to load active content even if a response were somehow mis-rendered.
+app.use("*", async (c, next) => {
+  await next();
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("X-Frame-Options", "DENY");
+  c.header("Referrer-Policy", "strict-origin-when-cross-origin");
+  c.header("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  c.header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'");
+});
+
+// Generic IP-based rate limiter backed by D1. Returns true if the request is
+// allowed (and records it), false if the caller has exceeded the limit.
+async function checkRateLimit(env, ip, bucket, maxCount, windowMinutes) {
+  if (!ip) return true; // no CF-Connecting-IP header (e.g. local dev) — don't block
+  const recent = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM rate_limits WHERE bucket = ? AND ip = ? AND created_at >= datetime('now', '-${windowMinutes} minutes')`
+  ).bind(bucket, ip).first();
+  if ((recent?.n || 0) >= maxCount) return false;
+  await env.DB.prepare("INSERT INTO rate_limits (bucket, ip) VALUES (?, ?)").bind(bucket, ip).run();
+  if (Math.random() < 0.02) {
+    await env.DB.prepare("DELETE FROM rate_limits WHERE created_at < datetime('now', '-1 day')").run();
+  }
+  return true;
+}
 
 function parseJsonField(value, fallback) {
   if (!value) return fallback;
@@ -37,6 +75,61 @@ function serializeService(row) {
 
 /* ---------------------------- Public: health ---------------------------- */
 app.get("/api/health", (c) => c.json({ ok: true }));
+
+/* ---------------------------- Auto-translate (ID -> EN) ---------------------------- */
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function translateOne(env, rawText) {
+  const text = String(rawText ?? "").slice(0, 3000);
+  if (!text.trim()) return text;
+
+  const hash = await sha256Hex(`en|${text}`);
+  const cached = await env.DB.prepare("SELECT translated_text FROM translation_cache WHERE hash = ?").bind(hash).first();
+  if (cached) return cached.translated_text;
+
+  try {
+    const out = await env.AI.run("@cf/meta/m2m100-1.2b", { text, source_lang: "id", target_lang: "en" });
+    const translated = (out && out.translated_text) ? out.translated_text : text;
+    await env.DB.prepare(
+      "INSERT INTO translation_cache (hash, translated_text) VALUES (?, ?) ON CONFLICT(hash) DO NOTHING"
+    ).bind(hash, translated).run();
+    return translated;
+  } catch {
+    return text;
+  }
+}
+
+// Runs translations with limited concurrency (Workers AI calls are I/O-bound —
+// parallelizing turns a 60-string page from ~90s to a few seconds).
+async function translateBatch(env, texts) {
+  const CONCURRENCY = 10;
+  const results = new Array(texts.length);
+  let next = 0;
+  async function worker() {
+    while (next < texts.length) {
+      const i = next++;
+      results[i] = await translateOne(env, texts[i]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, texts.length) }, worker));
+  return results;
+}
+
+app.post("/api/translate", async (c) => {
+  const ip = c.req.header("CF-Connecting-IP") || "";
+  const allowed = await checkRateLimit(c.env, ip, "translate", 40, 10);
+  if (!allowed) return c.json({ error: "Too many requests" }, 429);
+
+  const b = await c.req.json().catch(() => ({}));
+  const texts = Array.isArray(b.texts) ? b.texts.slice(0, 120) : [];
+  if (texts.length === 0) return c.json({ translations: [] });
+
+  const results = await translateBatch(c.env, texts);
+  return c.json({ translations: results });
+});
 
 /* ---------------------------- Auth ---------------------------- */
 const LOGIN_MAX_ATTEMPTS = 5;
@@ -317,6 +410,10 @@ app.delete("/api/process-steps/:id", requireAuth, async (c) => {
 
 /* ---------------------------- Newsletter subscribers ---------------------------- */
 app.post("/api/subscribe", async (c) => {
+  const ip = c.req.header("CF-Connecting-IP") || "";
+  const allowed = await checkRateLimit(c.env, ip, "subscribe", 5, 60);
+  if (!allowed) return c.json({ error: "Too many requests. Please try again later." }, 429);
+
   const b = await c.req.json().catch(() => ({}));
   const email = (b.email || "").trim().toLowerCase();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -364,6 +461,17 @@ app.post("/api/project-images", requireAuth, async (c) => {
     .run();
   const row = await c.env.DB.prepare("SELECT * FROM project_images WHERE id = ?").bind(result.meta.last_row_id).first();
   return c.json(row, 201);
+});
+
+app.put("/api/project-images/:id", requireAuth, async (c) => {
+  const id = c.req.param("id");
+  const b = await c.req.json().catch(() => ({}));
+  if (!b.image_url) return c.json({ error: "image_url is required" }, 400);
+  const existing = await c.env.DB.prepare("SELECT * FROM project_images WHERE id = ?").bind(id).first();
+  if (!existing) return c.json({ error: "Not found" }, 404);
+  await c.env.DB.prepare("UPDATE project_images SET image_url = ? WHERE id = ?").bind(b.image_url, id).run();
+  const row = await c.env.DB.prepare("SELECT * FROM project_images WHERE id = ?").bind(id).first();
+  return c.json(row);
 });
 
 app.delete("/api/project-images/:id", requireAuth, async (c) => {
@@ -486,6 +594,10 @@ app.delete("/api/faqs/:id", requireAuth, async (c) => {
 
 /* ---------------------------- Analytics (lightweight page-view tracking) ---------------------------- */
 app.post("/api/track", async (c) => {
+  const ip = c.req.header("CF-Connecting-IP") || "";
+  const allowed = await checkRateLimit(c.env, ip, "track", 120, 10);
+  if (!allowed) return c.json({ ok: true }); // silently drop, don't error out a real visitor's page
+
   const b = await c.req.json().catch(() => ({}));
   if (!b.path) return c.json({ error: "path is required" }, 400);
   await c.env.DB.prepare("INSERT INTO page_views (path, referrer) VALUES (?, ?)")
@@ -538,7 +650,14 @@ app.post("/api/messages", async (c) => {
   const result = await c.env.DB.prepare(
     "INSERT INTO messages (name, email, phone, subject, message, ip) VALUES (?, ?, ?, ?, ?, ?)"
   )
-    .bind(b.name, b.email, b.phone || "", b.subject || "", b.message, ip)
+    .bind(
+      String(b.name).slice(0, 200),
+      String(b.email).slice(0, 200),
+      String(b.phone || "").slice(0, 50),
+      String(b.subject || "").slice(0, 300),
+      String(b.message).slice(0, 5000),
+      ip
+    )
     .run();
 
   if (c.env.RESEND_API_KEY && c.env.NOTIFY_EMAIL) {

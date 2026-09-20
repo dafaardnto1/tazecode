@@ -4,6 +4,7 @@ import Seo from "../components/Seo";
 import { useLanguage } from "../i18n/LanguageContext";
 import { api } from "../lib/api";
 import { useSettings } from "../hooks/useApiData";
+import { useAutoTranslate } from "../hooks/useAutoTranslate";
 
 const EMPTY = { name: "", email: "", phone: "", subject: "", message: "" };
 
@@ -11,6 +12,16 @@ export default function Contact() {
   const { t } = useLanguage();
   const c = t.contact;
   const { settings } = useSettings();
+  const pageOverrides = useAutoTranslate({
+    eyebrow: settings.page_contact_eyebrow,
+    title: settings.page_contact_title,
+    desc: settings.page_contact_desc,
+    responseBadge: settings.contact_response_badge
+  });
+  const pageEyebrow = pageOverrides.eyebrow || c.eyebrow;
+  const pageTitle = pageOverrides.title || c.title;
+  const pageDesc = pageOverrides.desc || c.desc;
+  const responseBadge = pageOverrides.responseBadge;
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null); // { type: "success" | "error", text }
@@ -81,9 +92,14 @@ export default function Contact() {
 
       <section style={{ paddingBottom: 0 }}>
         <div className="container">
-          <div className="eyebrow">{c.eyebrow}</div>
-          <h1 className="section-title">{c.title}</h1>
-          <p className="section-desc" style={{ marginTop: 14 }}>{c.desc}</p>
+          <div className="eyebrow">{pageEyebrow}</div>
+          <h1 className="section-title">{pageTitle}</h1>
+          <p className="section-desc" style={{ marginTop: 14 }}>{pageDesc}</p>
+          {responseBadge && (
+            <div className="response-badge">
+              <span className="status-dot" /> {responseBadge}
+            </div>
+          )}
         </div>
       </section>
 

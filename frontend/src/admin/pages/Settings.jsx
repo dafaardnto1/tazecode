@@ -72,7 +72,7 @@ export default function AdminSettings() {
       <div className="admin-header">
         <div>
           <div className="admin-title">Settings</div>
-          <div className="admin-subtitle">Statistik homepage, info kontak, dan akun admin.</div>
+          <div className="admin-subtitle">Statistik homepage, info kontak, dan akun admin. Untuk konten teks tiap halaman, buka menu Control Panel.</div>
         </div>
       </div>
 
