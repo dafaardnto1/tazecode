@@ -108,13 +108,6 @@ export const api = {
   updateFaq: (id, data) => request(`/api/faqs/${id}`, { method: "PUT", auth: true, body: data }),
   deleteFaq: (id) => request(`/api/faqs/${id}`, { method: "DELETE", auth: true }),
 
-  getArticles: () => request("/api/articles"),
-  getAllArticles: () => request("/api/articles/all", { auth: true }),
-  getArticleBySlug: (slug) => request(`/api/articles/${slug}`),
-  createArticle: (data) => request("/api/articles", { method: "POST", auth: true, body: data }),
-  updateArticle: (id, data) => request(`/api/articles/${id}`, { method: "PUT", auth: true, body: data }),
-  deleteArticle: (id) => request(`/api/articles/${id}`, { method: "DELETE", auth: true }),
-
   subscribe: (email) => request("/api/subscribe", { method: "POST", body: { email } }),
   getSubscribers: () => request("/api/subscribers", { auth: true }),
   deleteSubscriber: (id) => request(`/api/subscribers/${id}`, { method: "DELETE", auth: true }),

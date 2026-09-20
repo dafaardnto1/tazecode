@@ -8,8 +8,6 @@ const SERVICE_FIELDS = ["title", "description", "features"];
 const PRICING_FIELDS = ["name", "description", "features", "price_suffix"];
 const FAQ_FIELDS = ["question", "answer"];
 const TESTIMONIAL_FIELDS = ["review_text", "client_position", "client_company"];
-const ARTICLE_LIST_FIELDS = ["title", "excerpt"];
-export const ARTICLE_DETAIL_FIELDS = ["title", "excerpt", "content"];
 const PROCESS_FIELDS = ["title", "description"];
 
 // Fetches live data from the Worker API; falls back to the bundled static
@@ -205,32 +203,6 @@ export function useFaqs() {
 
   const translated = useAutoTranslateFields(faqs, FAQ_FIELDS);
   return { faqs: translated, loading };
-}
-
-export function useArticles() {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    api
-      .getArticles()
-      .then((data) => {
-        if (!cancelled && Array.isArray(data)) setArticles(data);
-      })
-      .catch(() => {
-        /* no articles until API is reachable */
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const translated = useAutoTranslateFields(articles, ARTICLE_LIST_FIELDS);
-  return { articles: translated, loading };
 }
 
 export function useServices(staticServices) {

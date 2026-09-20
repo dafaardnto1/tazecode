@@ -11,7 +11,6 @@ const LINKS = [
   ["/admin/pricing", "Harga / Pricelist", false],
   ["/admin/process", "Cara Kerja", false],
   ["/admin/faq", "FAQ", false],
-  ["/admin/articles", "Blog / Artikel", false],
   ["/admin/testimonials", "Testimonials", false],
   ["/admin/messages", "Messages", false],
   ["/admin/subscribers", "Subscribers", false],

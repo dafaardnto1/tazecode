@@ -46,15 +46,6 @@ const SECTIONS = [
     ]
   },
   {
-    key: "blog",
-    label: "Halaman Blog",
-    fields: [
-      ["page_blog_eyebrow", "Eyebrow", "text", "Blog"],
-      ["page_blog_title", "Judul Halaman", "text", "Tips & Insight Seputar Website."],
-      ["page_blog_desc", "Deskripsi", "textarea", ""]
-    ]
-  },
-  {
     key: "kontak",
     label: "Halaman Kontak",
     fields: [

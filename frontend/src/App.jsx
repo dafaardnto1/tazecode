@@ -5,8 +5,6 @@ import Pricelist from "./pages/Pricelist";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import Services from "./pages/Services";
-import Blog from "./pages/Blog";
-import BlogDetail from "./pages/BlogDetail";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -20,7 +18,6 @@ import AdminServices from "./admin/pages/Services";
 import AdminPricing from "./admin/pages/Pricing";
 import AdminProcess from "./admin/pages/Process";
 import AdminFaq from "./admin/pages/Faq";
-import AdminArticles from "./admin/pages/Articles";
 import AdminTestimonials from "./admin/pages/Testimonials";
 import AdminMessages from "./admin/pages/Messages";
 import AdminSubscribers from "./admin/pages/Subscribers";
@@ -38,8 +35,6 @@ export default function App() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:slug" element={<ProjectDetail />} />
           <Route path="/services" element={<Services />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Route>
@@ -59,7 +54,6 @@ export default function App() {
           <Route path="pricing" element={<AdminPricing />} />
           <Route path="process" element={<AdminProcess />} />
           <Route path="faq" element={<AdminFaq />} />
-          <Route path="articles" element={<AdminArticles />} />
           <Route path="testimonials" element={<AdminTestimonials />} />
           <Route path="messages" element={<AdminMessages />} />
           <Route path="subscribers" element={<AdminSubscribers />} />

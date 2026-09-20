@@ -479,79 +479,6 @@ app.delete("/api/project-images/:id", requireAuth, async (c) => {
   return c.json({ ok: true });
 });
 
-/* ---------------------------- Articles (blog) ---------------------------- */
-app.get("/api/articles", async (c) => {
-  const { results } = await c.env.DB.prepare(
-    "SELECT * FROM articles WHERE is_published = 1 ORDER BY created_at DESC"
-  ).all();
-  return c.json(results.map((r) => ({ ...r, is_published: !!r.is_published })));
-});
-
-app.get("/api/articles/all", requireAuth, async (c) => {
-  const { results } = await c.env.DB.prepare("SELECT * FROM articles ORDER BY created_at DESC").all();
-  return c.json(results.map((r) => ({ ...r, is_published: !!r.is_published })));
-});
-
-app.get("/api/articles/:slug", async (c) => {
-  const row = await c.env.DB.prepare("SELECT * FROM articles WHERE slug = ? AND is_published = 1")
-    .bind(c.req.param("slug"))
-    .first();
-  if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json({ ...row, is_published: !!row.is_published });
-});
-
-app.post("/api/articles", requireAuth, async (c) => {
-  const b = await c.req.json().catch(() => ({}));
-  if (!b.slug || !b.title || !b.content) return c.json({ error: "slug, title, and content are required" }, 400);
-
-  const existing = await c.env.DB.prepare("SELECT id FROM articles WHERE slug = ?").bind(b.slug).first();
-  if (existing) return c.json({ error: "An article with this slug already exists" }, 409);
-
-  const result = await c.env.DB.prepare(
-    `INSERT INTO articles (slug, title, excerpt, content, cover_image_url, is_published, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
-  )
-    .bind(b.slug, b.title, b.excerpt || "", b.content, b.cover_image_url || "", b.is_published !== false ? 1 : 0)
-    .run();
-  const row = await c.env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(result.meta.last_row_id).first();
-  return c.json({ ...row, is_published: !!row.is_published }, 201);
-});
-
-app.put("/api/articles/:id", requireAuth, async (c) => {
-  const id = c.req.param("id");
-  const b = await c.req.json().catch(() => ({}));
-  const existing = await c.env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
-  if (!existing) return c.json({ error: "Not found" }, 404);
-
-  if (b.slug && b.slug !== existing.slug) {
-    const dupe = await c.env.DB.prepare("SELECT id FROM articles WHERE slug = ? AND id != ?").bind(b.slug, id).first();
-    if (dupe) return c.json({ error: "An article with this slug already exists" }, 409);
-  }
-
-  await c.env.DB.prepare(
-    `UPDATE articles SET slug=?, title=?, excerpt=?, content=?, cover_image_url=?, is_published=?, updated_at=CURRENT_TIMESTAMP
-     WHERE id=?`
-  )
-    .bind(
-      b.slug ?? existing.slug,
-      b.title ?? existing.title,
-      b.excerpt ?? existing.excerpt,
-      b.content ?? existing.content,
-      b.cover_image_url ?? existing.cover_image_url,
-      b.is_published !== undefined ? (b.is_published ? 1 : 0) : existing.is_published,
-      id
-    )
-    .run();
-
-  const row = await c.env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
-  return c.json({ ...row, is_published: !!row.is_published });
-});
-
-app.delete("/api/articles/:id", requireAuth, async (c) => {
-  await c.env.DB.prepare("DELETE FROM articles WHERE id = ?").bind(c.req.param("id")).run();
-  return c.json({ ok: true });
-});
-
 /* ---------------------------- FAQ ---------------------------- */
 app.get("/api/faqs", async (c) => {
   const { results } = await c.env.DB.prepare("SELECT * FROM faqs ORDER BY sort_order ASC, id ASC").all();
@@ -876,7 +803,7 @@ app.notFound((c) => c.json({ error: "Not found" }, 404));
 
 const BACKUP_TABLES = [
   "projects", "services", "pricing_plans", "process_steps",
-  "testimonials", "articles", "faqs", "project_images", "subscribers", "messages"
+  "testimonials", "faqs", "project_images", "subscribers", "messages"
 ];
 
 async function runBackup(env) {

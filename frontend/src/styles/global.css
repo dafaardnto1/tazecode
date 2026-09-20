@@ -370,26 +370,6 @@ section{ padding-block: clamp(56px, 8vw, 108px); }
 .gallery-mockup-screen img{ width:100%; height:100%; object-fit:cover; display:block; }
 @media (max-width: 640px){ .gallery-mockup{ width: 86vw; } }
 
-/* -------------------------------- Blog -------------------------------- */
-.blog-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-.blog-card{ display:flex; flex-direction:column; background: var(--paper); border:1px solid var(--line-soft); border-radius: 12px; overflow:hidden; text-decoration:none; color:inherit; transition: transform 0.2s ease, border-color 0.2s ease; }
-.blog-card:hover{ transform: translateY(-4px); border-color: var(--accent); }
-.blog-card-thumb{ aspect-ratio: 16/9; overflow:hidden; background: var(--paper-2); }
-.blog-card-thumb img{ width:100%; height:100%; object-fit:cover; }
-.blog-card-body{ padding: 20px; display:flex; flex-direction:column; gap:8px; flex:1; }
-.blog-card-date{ font-family: var(--mono); font-size: 12px; color: var(--muted); }
-.blog-card-title{ font-size: 18px; font-weight: 700; line-height:1.35; margin:0; }
-.blog-card-excerpt{ font-size: 14px; color: var(--muted); line-height:1.55; margin:0; flex:1; }
-.blog-card-link{ font-size: 13px; font-weight:600; color: var(--accent); margin-top: 4px; }
-
-.blog-back-link{ display:inline-block; font-size: 13px; color: var(--muted); text-decoration:none; margin-bottom: 16px; }
-.blog-back-link:hover{ color: var(--accent); }
-.blog-detail-date{ font-family: var(--mono); font-size: 13px; color: var(--muted); }
-.blog-detail-cover{ width:100%; aspect-ratio: 16/9; border-radius: 12px; overflow:hidden; margin: 24px 0; background: var(--paper-2); }
-.blog-detail-cover img{ width:100%; height:100%; object-fit:cover; }
-.blog-detail-content{ font-size: 16px; line-height: 1.8; color: var(--ink); padding-bottom: 60px; }
-.blog-detail-content p{ margin: 0 0 20px; }
-
 /* -------------------------------- Newsletter -------------------------------- */
 .newsletter-box{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px; background: var(--paper-2); border:1px solid var(--line-soft); border-radius:12px; padding: 28px 32px; margin: 48px 0; }
 .newsletter-text h3{ margin:0 0 4px; font-size:17px; }
@@ -569,7 +549,6 @@ section{ padding-block: clamp(56px, 8vw, 108px); }
 [data-reveal] .service-card,
 [data-reveal] .price-card,
 [data-reveal] .testimonial-card,
-[data-reveal] .blog-card,
 [data-reveal] .faq-item{
   opacity:0; transform: perspective(700px) rotateX(10deg) translateY(18px);
   transition: opacity .5s ease, transform .5s cubic-bezier(.2,.7,.3,1);
@@ -578,19 +557,18 @@ section{ padding-block: clamp(56px, 8vw, 108px); }
 [data-reveal].in .service-card,
 [data-reveal].in .price-card,
 [data-reveal].in .testimonial-card,
-[data-reveal].in .blog-card,
 [data-reveal].in .faq-item{
   opacity:1; transform:none;
 }
 [data-reveal] .cell:nth-child(2), [data-reveal] .service-card:nth-child(2),
 [data-reveal] .price-card:nth-child(2), [data-reveal] .testimonial-card:nth-child(2),
-[data-reveal] .blog-card:nth-child(2), [data-reveal] .faq-item:nth-child(2){ transition-delay: .07s; }
+[data-reveal] .faq-item:nth-child(2){ transition-delay: .07s; }
 [data-reveal] .cell:nth-child(3), [data-reveal] .service-card:nth-child(3),
 [data-reveal] .price-card:nth-child(3), [data-reveal] .testimonial-card:nth-child(3),
-[data-reveal] .blog-card:nth-child(3), [data-reveal] .faq-item:nth-child(3){ transition-delay: .14s; }
+[data-reveal] .faq-item:nth-child(3){ transition-delay: .14s; }
 [data-reveal] .cell:nth-child(4), [data-reveal] .service-card:nth-child(4),
 [data-reveal] .price-card:nth-child(4), [data-reveal] .testimonial-card:nth-child(4),
-[data-reveal] .blog-card:nth-child(4), [data-reveal] .faq-item:nth-child(4){ transition-delay: .21s; }
+[data-reveal] .faq-item:nth-child(4){ transition-delay: .21s; }
 [data-reveal] .cell:nth-child(5), [data-reveal] .service-card:nth-child(5),
 [data-reveal] .price-card:nth-child(5), [data-reveal] .testimonial-card:nth-child(5),
 [data-reveal] .faq-item:nth-child(5){ transition-delay: .28s; }
@@ -598,7 +576,7 @@ section{ padding-block: clamp(56px, 8vw, 108px); }
 [data-reveal] .faq-item:nth-child(6){ transition-delay: .35s; }
 @media (prefers-reduced-motion: reduce){
   [data-reveal] .cell, [data-reveal] .service-card, [data-reveal] .price-card,
-  [data-reveal] .testimonial-card, [data-reveal] .blog-card, [data-reveal] .faq-item{
+  [data-reveal] .testimonial-card, [data-reveal] .faq-item{
     transition: none;
   }
 }

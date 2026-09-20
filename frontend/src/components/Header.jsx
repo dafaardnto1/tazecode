@@ -9,12 +9,12 @@ export default function Header() {
   const { lang, toggleLang, t } = useLanguage();
 
   const LINKS = [
-    ["/", t.nav.home],
-    ["/harga", t.nav.pricelist],
-    ["/projects", t.nav.projects],
-    ["/services", t.nav.services],
-    ["/blog", t.nav.blog],
-    ["/contact", t.nav.contact]
+    { href: "/", label: t.nav.home },
+    { href: "/harga", label: t.nav.pricelist },
+    { href: "/projects", label: t.nav.projects },
+    { href: "/services", label: t.nav.services },
+    { href: "https://tazesubscription.pages.dev/", label: t.nav.subscription, external: true },
+    { href: "/contact", label: t.nav.contact }
   ];
 
   useEffect(() => {
@@ -40,11 +40,15 @@ export default function Header() {
           TAZECODE
         </Link>
         <div className="nav-links">
-          {LINKS.map(([href, label]) => (
-            <NavLink key={href} to={href} end={href === "/"} className={({ isActive }) => (isActive ? "active" : "")}>
-              {label}
-            </NavLink>
-          ))}
+          {LINKS.map(({ href, label, external }) =>
+            external ? (
+              <a key={href} href={href} target="_blank" rel="noopener noreferrer">{label}</a>
+            ) : (
+              <NavLink key={href} to={href} end={href === "/"} className={({ isActive }) => (isActive ? "active" : "")}>
+                {label}
+              </NavLink>
+            )
+          )}
         </div>
         <div className="nav-right">
           <button className="lang-toggle" type="button" aria-label="Switch language" onClick={toggleLang}>
@@ -79,11 +83,15 @@ export default function Header() {
           </button>
         </div>
         <ul>
-          {LINKS.map(([href, label]) => (
+          {LINKS.map(({ href, label, external }) => (
             <li key={href}>
-              <NavLink to={href} end={href === "/"} onClick={() => setOpen(false)} className={({ isActive }) => (isActive ? "active" : "")}>
-                {label}
-              </NavLink>
+              {external ? (
+                <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>{label}</a>
+              ) : (
+                <NavLink to={href} end={href === "/"} onClick={() => setOpen(false)} className={({ isActive }) => (isActive ? "active" : "")}>
+                  {label}
+                </NavLink>
+              )}
             </li>
           ))}
         </ul>

@@ -27,10 +27,6 @@ export const translations = {
       notFound: {
         title: "Halaman Tidak Ditemukan — TAZECODE",
         desc: "Halaman yang Anda cari tidak ditemukan."
-      },
-      blog: {
-        title: "Blog — Tips & Insight Jasa Website Murah | TAZECODE",
-        desc: "Artikel seputar jasa website murah, tips memilih jasa pembuatan website, dan insight digital untuk bisnis Anda dari TAZECODE."
       }
     },
     nav: {
@@ -38,7 +34,7 @@ export const translations = {
       pricelist: "Harga",
       projects: "Portofolio",
       services: "Layanan",
-      blog: "Blog",
+      subscription: "Sewa Website",
       contact: "Kontak",
       talk: "Konsultasi Gratis"
     },
@@ -97,16 +93,6 @@ export const translations = {
     faq: {
       eyebrow: "FAQ",
       title: "Pertanyaan yang Sering Ditanyakan."
-    },
-    blog: {
-      eyebrow: "Blog",
-      title: "Tips & Insight Seputar Website.",
-      desc: "Artikel seputar jasa website murah, tips digital, dan insight untuk bisnis Anda.",
-      empty: "Belum ada artikel.",
-      readMore: "Baca selengkapnya",
-      notFoundEyebrow: "404",
-      notFoundTitle: "Artikel tidak ditemukan.",
-      backBtn: "Kembali ke Blog"
     },
     newsletter: {
       title: "Dapatkan Tips Website Terbaru",
@@ -264,10 +250,6 @@ export const translations = {
       notFound: {
         title: "Page Not Found — TAZECODE",
         desc: "The page you're looking for doesn't exist."
-      },
-      blog: {
-        title: "Blog — Tips & Insights on Affordable Web Services | TAZECODE",
-        desc: "Articles about affordable web development services, tips on choosing a web agency, and digital insights for your business from TAZECODE."
       }
     },
     nav: {
@@ -275,7 +257,7 @@ export const translations = {
       pricelist: "Pricing",
       projects: "Projects",
       services: "Services",
-      blog: "Blog",
+      subscription: "Website Subscription",
       contact: "Contact",
       talk: "Let's Talk"
     },
@@ -334,16 +316,6 @@ export const translations = {
     faq: {
       eyebrow: "FAQ",
       title: "Frequently Asked Questions."
-    },
-    blog: {
-      eyebrow: "Blog",
-      title: "Tips & Insights.",
-      desc: "Articles about affordable web services, digital tips, and insights for your business.",
-      empty: "No articles yet.",
-      readMore: "Read more",
-      notFoundEyebrow: "404",
-      notFoundTitle: "Article not found.",
-      backBtn: "Back to Blog"
     },
     newsletter: {
       title: "Get the Latest Web Tips",
